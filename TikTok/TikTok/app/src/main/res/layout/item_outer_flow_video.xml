@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 导入ViewModel和工具类 -->
+    <data>
+        <import type="com.example.tiktok.viewmodel.OuterFlowViewModel"/>
+        <import type="com.example.tiktok.utils.ResourceUtils"/>
+        <variable
+            name="video"
+            type="com.example.tiktok.model.VideoInfo" />
+        <variable
+            name="viewModel"
+            type="OuterFlowViewModel" />
+        <!-- 点击事件回调 -->
+        <variable
+            name="onItemClick"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <!-- 双列Item布局（宽度match_parent，RecyclerView设置为双列） -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        app:cardCornerRadius="8dp"
+        android:onClick="@{onItemClick}"> <!-- 点击进入内流 -->
+
+        <!-- 视频封面 -->
+        <ImageView
+            android:id="@+id/iv_cover"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@{ResourceUtils.getDrawableResId(viewModel.getContext(), video.coverResName)}" />
+
+        <!-- 标题 -->
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@{video.title}"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintTop_toBottomOf="@+id/iv_cover" />
+
+        <!-- 底部信息栏 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title">
+
+            <!-- 发布者头像 -->
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@{ResourceUtils.getDrawableResId(viewModel.getContext(), video.publisherAvatarResName)}" />
+
+            <!-- 发布者昵称 -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="4dp"
+                android:text="@{video.publisherName}"
+                android:textSize="12sp" />
+
+            <!-- 点赞数 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(video.likeCount)}"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</layout>
