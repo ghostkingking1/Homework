@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
-            android:name=".CommentPanelActivity"
+            android:name=".InnerFlowActivity"
             android:exported="false" />
         <activity
             android:name=".OuterFlowActivity"
