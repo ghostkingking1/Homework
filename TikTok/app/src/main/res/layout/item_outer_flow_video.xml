@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 导入ViewModel和工具类 -->
+    <data>
+        <import type="com.example.tiktok.viewmodel.OuterFlowViewModel"/>
+        <import type="com.example.tiktok.utils.ResourceUtils"/>
+        <variable
+            name="video"
+            type="com.example.tiktok.model.VideoInfo" />
+        <variable
+            name="viewModel"
+            type="OuterFlowViewModel" />
+        <!-- 点击事件回调 -->
+        <variable
+            name="onItemClick"
+            type="android.view.View.OnClickListener" />
+    </data>
+
+    <!-- 双列Item布局（宽度match_parent，RecyclerView设置为双列） -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        app:cardCornerRadius="8dp"
+        android:onClick="@{onItemClick}">
+        <!-- 视频封面 -->
+        <ImageView
+            android:id="@+id/iv_cover"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            app:resName="@{video.coverResName}"
+            app:context="@{viewModel.getContext()}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+
+            />
+
+        <!-- 标题 -->
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@{video.title}"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            app:layout_constraintTop_toBottomOf="@+id/iv_cover"
+            />
+
+        <!-- 底部信息栏 -->
+
+
+        <!-- 发布者头像 -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            app:resName="@{video.publisherAvatarResName}"
+            app:context="@{viewModel.getContext()}"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:id="@+id/iv_avatar"
+            />
+
+        <!-- 发布者昵称 -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="@{video.publisherName}"
+            android:textSize="12sp"
+            app:layout_constraintTop_toTopOf="@+id/iv_avatar"
+            app:layout_constraintLeft_toRightOf="@+id/iv_avatar"
+
+            />
+
+        <!-- 点赞数 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(video.likeCount)}"
+            android:textSize="12sp"
+            android:textColor="#949494"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_title"
+
+            />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>

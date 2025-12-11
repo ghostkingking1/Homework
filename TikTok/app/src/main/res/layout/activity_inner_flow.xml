@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="com.example.tiktok.utils.ResourceUtils"/>
+        <variable
+            name="viewModel"
+            type="com.example.tiktok.viewmodel.InnerFlowViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- 视频播放View -->
+        <VideoView
+            android:id="@+id/video_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="@{() -> viewModel.togglePlayPause()}" />
+
+        <!-- 暂停图标（播放时隐藏，暂停时显示） -->
+        <ImageView
+            android:id="@+id/iv_pause"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/ic_pause"
+            android:visibility="@{viewModel.isPlaying ? android.view.View.GONE : android.view.View.VISIBLE}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <!-- 右侧操作栏 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_margin="16dp">
+
+            <!-- 点赞按钮 -->
+            <ImageView
+                android:id="@+id/iv_like"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@{viewModel.getCurrentVideo() != null &amp;&amp; viewModel.getCurrentVideo().isLiked() ? @drawable/ic_liked : @drawable/ic_unliked}"
+                android:onClick="@{() -> viewModel.toggleLike()}" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.getCurrentVideo() != null ? String.valueOf(viewModel.getCurrentVideo().getLikeCount()) : ``}"
+                android:layout_gravity="center" />
+
+
+            <!-- 评论按钮 -->
+            <ImageView
+                android:id="@+id/iv_comment"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_comment"
+                android:layout_marginTop="16dp" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.getCurrentVideo() != null ? String.valueOf(viewModel.getCurrentVideo().getCommentCount()) : ``}"
+                android:layout_gravity="center" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
