@@ -2,24 +2,21 @@ package com.example.tiktok;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.MediaController;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
-import com.example.tiktok.R;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.tiktok.adapter.InnerFlowVideoAdapter;
 import com.example.tiktok.databinding.ActivityInnerFlowBinding;
 import com.example.tiktok.model.VideoInfo;
-import com.example.tiktok.repository.VideoRepository;
-import com.example.tiktok.CommentPanelActivity;
 import com.example.tiktok.viewmodel.InnerFlowViewModel;
 
-/**
- * 视频内流Activity：播放视频
- */
 public class InnerFlowActivity extends AppCompatActivity {
     private ActivityInnerFlowBinding mBinding;
     private InnerFlowViewModel mViewModel;
-    private VideoInfo mCurrentVideo;
+    private InnerFlowVideoAdapter mAdapter;
+    private int mStartPosition; // 初始播放位置
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,67 +26,71 @@ public class InnerFlowActivity extends AppCompatActivity {
         mBinding.setViewModel(mViewModel);
         mBinding.setLifecycleOwner(this);
 
-        // 获取传递的视频ID
+        // 获取初始视频ID，计算起始位置
         int videoId = getIntent().getIntExtra("video_id", 0);
-        // 从仓库获取对应视频
-        mCurrentVideo = VideoRepository.getInstance(this)
-                .getOuterFlowVideoList()
-                .stream()
-                .filter(video -> video.getId() == videoId)
-                .findFirst()
-                .orElse(null);
+        mStartPosition = findPositionByVideoId(videoId);
 
-        // 设置当前视频到ViewModel
-        if (mCurrentVideo != null) {
-            mViewModel.setCurrentVideo(mCurrentVideo);
-            // 初始化VideoView
-            initVideoView();
-        }
+        // 初始化RecyclerView
+        initRecyclerView();
 
-        // 观察播放状态，控制VideoView
-        mViewModel.isPlaying.observe(this, isPlaying -> {
-            if (isPlaying) {
-                mBinding.videoView.start();
-            } else {
-                mBinding.videoView.pause();
+        // 监听滑动，切换视频播放状态
+        mBinding.rvInnerFlow.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    // 获取当前可见的Item位置
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+                    mViewModel.switchToPosition(firstVisiblePosition);
+                }
             }
         });
 
-        // 评论按钮点击事件
-        mBinding.ivComment.setOnClickListener(v -> {
-            Intent intent = new Intent(InnerFlowActivity.this, CommentPanelActivity.class);
-            intent.putExtra("video_id", mCurrentVideo.getId());
+        // 监听评论点击
+        mViewModel.openCommentCallback = video -> {
+            Intent intent = new Intent(this, CommentPanelActivity.class);
+            intent.putExtra("video_id", video.getId());
             startActivity(intent);
+        };
+    }
+
+    private void initRecyclerView() {
+        mAdapter = new InnerFlowVideoAdapter(mViewModel);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL); // 垂直滑动
+        mBinding.rvInnerFlow.setLayoutManager(layoutManager);
+        mBinding.rvInnerFlow.setAdapter(mAdapter);
+
+        // 观察视频列表变化
+        mViewModel.videoListLiveData.observe(this, videoList -> {
+            mAdapter.submitList(videoList);
+            // 滚动到初始位置
+            mBinding.rvInnerFlow.scrollToPosition(mStartPosition);
         });
     }
 
-    /**
-     * 初始化VideoView
-     */
-    private void initVideoView() {
-        // 设置视频Uri
-        mBinding.videoView.setVideoURI(mViewModel.getVideoUri());
-        // 设置媒体控制器（可选）
-        mBinding.videoView.setMediaController(new MediaController(this));
-        // 准备完成后自动播放
-        mBinding.videoView.setOnPreparedListener(mp -> {
-            if (mViewModel.isPlaying.getValue()) {
-                mBinding.videoView.start();
+    // 根据视频ID查找位置
+    private int findPositionByVideoId(int videoId) {
+        List<VideoInfo> videoList = mViewModel.videoListLiveData.getValue();
+        if (videoList == null) return 0;
+        for (int i = 0; i < videoList.size(); i++) {
+            if (videoList.get(i).getId() == videoId) {
+                return i;
             }
-        });
+        }
+        return 0;
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        // 暂停播放
-        mViewModel.pausePlay();
+        mViewModel.isPlaying.setValue(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        // 恢复播放
-        mViewModel.startPlay();
+        mViewModel.isPlaying.setValue(true);
     }
 }
