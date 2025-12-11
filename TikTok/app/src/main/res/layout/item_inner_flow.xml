@@ -9,6 +9,9 @@
         <variable
             name="video"
             type="com.example.tiktok.model.VideoInfo" />
+        <variable
+            name="videoView"
+            type="com.example.tiktok.InnerFlowActivity" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
