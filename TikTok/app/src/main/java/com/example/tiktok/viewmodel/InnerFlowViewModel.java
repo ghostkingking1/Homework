@@ -122,4 +122,12 @@ public class InnerFlowViewModel extends AndroidViewModel {
         intent.putExtra("video_id", videoId);
         context.startActivity(intent);
     }
+
+    // 新增：处理评论按钮点击的openComment方法
+    public void openComment(VideoInfo video) {
+        if (video != null) {
+            // 调用已有的jumpToCommentPanel方法（需传入Context，这里用Application的上下文）
+            jumpToCommentPanel(getApplication(), video.getId());
+        }
+    }
 }

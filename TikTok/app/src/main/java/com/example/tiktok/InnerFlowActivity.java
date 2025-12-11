@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 import com.example.tiktok.databinding.ActivityInnerFlowBinding;
+import com.example.tiktok.databinding.ItemInnerFlowBinding;
 import com.example.tiktok.model.VideoInfo;
 import com.example.tiktok.repository.VideoRepository;
 import com.example.tiktok.viewmodel.InnerFlowViewModel;
@@ -16,7 +17,7 @@ import com.example.tiktok.viewmodel.InnerFlowViewModel;
  * 视频内流Activity：播放视频
  */
 public class InnerFlowActivity extends AppCompatActivity {
-    private ActivityInnerFlowBinding mBinding;
+    private ItemInnerFlowBinding mBinding;
     private InnerFlowViewModel mViewModel;
     private VideoInfo mCurrentVideo;
 
